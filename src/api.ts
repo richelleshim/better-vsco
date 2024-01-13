@@ -9,6 +9,7 @@ import {
 } from "firebase/firestore";
 import { z } from "zod";
 import { useEffect, useState } from "react";
+import { sortBy } from "./utils/arrays";
 
 const POSTS_COLLECTION_NAME = "posts";
 
@@ -31,6 +32,7 @@ export type PostSchema = z.infer<typeof PostSchema>;
 
 export type Post = {
   id: string;
+  index: number;
   caption: string;
   created: Date;
   image: string;
@@ -69,13 +71,22 @@ export const useSubscribePosts = () => {
 
   useEffect(() => {
     onSnapshot(collection(db, POSTS_COLLECTION_NAME), (snapshot) => {
-      const posts = snapshot.docs.map((doc) => {
-        const postDoc = PostSchema.parse(doc.data());
-        const post: Post = {
-          ...postDoc,
+      const baseDocs = snapshot.docs.map((doc) => {
+        return {
+          ...PostSchema.parse(doc.data()),
           id: doc.id,
         };
-        return post;
+      });
+
+      const sortedDocs = sortBy(baseDocs, (doc) => doc.created, {
+        reverse: true,
+      });
+
+      const posts = sortedDocs.map((doc, index): Post => {
+        return {
+          ...doc,
+          index,
+        };
       });
 
       setPosts(posts);

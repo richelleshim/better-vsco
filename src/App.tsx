@@ -8,13 +8,14 @@ import {
   Stack,
   Typography,
   Box,
-  Drawer,
+  ListItemButton,
 } from "@mui/joy";
 import { createPost, CreatePostInput, Post, useSubscribePosts } from "./api";
 import { PostDisplay } from "./PostDisplay";
 import { ProfilePhoto } from "./ProfilePhoto";
 import { theme } from "./theme";
 import { sortBy } from "./utils/arrays";
+import { FullPostDisplay } from "./FullPostDisplay";
 
 const initialPostInput: CreatePostInput = {
   caption: "",
@@ -43,57 +44,24 @@ const bucketPosts = (posts: Post[]) => {
 
 export const App = () => {
   const [postInput, setPostInput] = useState<CreatePostInput>(initialPostInput);
+  const [postIndex, setPostIndex] = useState<number | null>(null);
+
   const posts = useSubscribePosts();
 
   if (posts === null) return null;
 
-  const shownPosts = sortBy(
-    posts,
-    (post) => {
-      return post.created;
-    },
-    { reverse: true }
-  );
-
-  const buckets = bucketPosts(shownPosts);
+  const buckets = bucketPosts(posts);
 
   return (
     <CssVarsProvider theme={theme}>
-      <Stack direction="row">
-        <Container fixed>
-          <Box sx={{ bgcolor: "#000000", height: "100%" }}> </Box>
-          <Stack spacing={2} mb={4} direction="row">
-            <Input
-              placeholder="Image"
-              value={postInput.image}
-              size="lg"
-              onChange={(event) => {
-                const url = event.target.value;
-                const post = {
-                  ...postInput,
-                  image: url,
-                };
-                setPostInput(post);
-              }}
-            />
-            <Button
-              variant="solid"
-              onClick={() => {
-                createPost(postInput);
-                setPostInput(initialPostInput);
-              }}
-            >
-              + New Post
-            </Button>
-          </Stack>
-        </Container>
+      {postIndex === null ? (
         <Stack>
           <Stack alignItems="center" spacing={1}>
             <ProfilePhoto />
             <Typography level="body-sm" fontWeight="lg">
               richelleshim
             </Typography>
-            <Typography level="body-sm" fontStyle={"bold"}>
+            <Typography level="body-sm" fontStyle="bold">
               richelleshim
             </Typography>
             <Typography level="body-sm">ABOUT</Typography>
@@ -105,7 +73,16 @@ export const App = () => {
                 return (
                   <Stack spacing={3}>
                     {bucket.map((post) => {
-                      return <PostDisplay post={post} key={post.id}/>;
+                      return (
+                        <ListItemButton
+                          key={post.id}
+                          onClick={() => {
+                            setPostIndex(post.index);
+                          }}
+                        >
+                          <img src={post.image} width="200px" />
+                        </ListItemButton>
+                      );
                     })}
                   </Stack>
                 );
@@ -113,7 +90,20 @@ export const App = () => {
             </Stack>
           </Container>
         </Stack>
-      </Stack>
+      ) : (
+        <FullPostDisplay
+          post={posts[Math.min(postIndex, posts.length - 1)]}
+          onClose={() => {
+            setPostIndex(null);
+          }}
+          onPrev={postIndex === 0 ? null : () => setPostIndex(postIndex - 1)}
+          onNext={
+            postIndex === posts.length - 1
+              ? null
+              : () => setPostIndex(postIndex + 1)
+          }
+        />
+      )}
     </CssVarsProvider>
   );
 };
