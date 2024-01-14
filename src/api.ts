@@ -6,6 +6,8 @@ import {
   onSnapshot,
   deleteDoc,
   updateDoc,
+  setDoc,
+  getDoc,
 } from "firebase/firestore";
 import { z } from "zod";
 import { useEffect, useState } from "react";
@@ -14,6 +16,7 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 
 const POSTS_COLLECTION_NAME = "posts";
+const USERS_COLLECTION_NAME = "users";
 
 const DateSchema = z
   .object({ seconds: z.number(), nanoseconds: z.number() })
@@ -59,6 +62,49 @@ export const createPost = async (postInput: CreatePostInput) => {
     ...post,
     id: doc.id,
   };
+};
+
+export const UserSchema = z.object({
+  email: z.string(),
+  username: z.string(),
+  about: z.string().nullable(),
+  reportCount: z.number(),
+});
+export type UserSchema = z.infer<typeof UserSchema>;
+
+export type User = UserSchema;
+
+type CreateUserInput = {
+  email: string;
+  username: string;
+  about: string | null;
+};
+
+export const createUser = async ({
+  email,
+  username,
+  about,
+}: CreateUserInput) => {
+  const user: User = {
+    email,
+    username,
+    about,
+    reportCount: 0,
+  };
+
+  const userPath = doc(db, USERS_COLLECTION_NAME, email);
+
+  await setDoc(userPath, user);
+
+  return user;
+};
+
+export const getUser = async (email: string) => {
+  const userPath = doc(db, USERS_COLLECTION_NAME, email);
+  const userDoc = await getDoc(userPath);
+  const userData = userDoc.data();
+  
+  return userData === undefined ? null : UserSchema.parse(userData);
 };
 
 export const deletePost = async (postId: string) => {
