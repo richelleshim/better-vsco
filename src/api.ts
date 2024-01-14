@@ -1,4 +1,4 @@
-import { db } from "./global";
+import { db, fileStorage } from "./global";
 import {
   collection,
   doc,
@@ -10,6 +10,8 @@ import {
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { sortBy } from "./utils/arrays";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
 
 const POSTS_COLLECTION_NAME = "posts";
 
@@ -94,4 +96,15 @@ export const useSubscribePosts = () => {
   }, []);
 
   return posts;
+};
+
+const postImagePath = ref(fileStorage, "post-images/");
+
+export const uploadPostImage = async (file: File) => {
+  const fileName = uuidv4();
+  const imagePath = ref(postImagePath, fileName);
+  await uploadBytes(imagePath, file);
+
+  const imageURL = await getDownloadURL(imagePath);
+  return imageURL;
 };

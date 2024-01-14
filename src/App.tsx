@@ -1,34 +1,24 @@
 import { useState } from "react";
 
 import {
-  Button,
   CssVarsProvider,
   Container,
-  Input,
   Stack,
   Typography,
-  Box,
   ListItemButton,
+  Dropdown,
+  Menu,
+  MenuButton,
+  MenuItem,
+  useTheme,
+  Button,
 } from "@mui/joy";
-import { createPost, CreatePostInput, Post, useSubscribePosts } from "./api";
-import { PostDisplay } from "./PostDisplay";
+import { Post, useSubscribePosts } from "./api";
 import { ProfilePhoto } from "./ProfilePhoto";
 import { theme } from "./theme";
-import { sortBy } from "./utils/arrays";
 import { FullPostDisplay } from "./FullPostDisplay";
-
-const initialPostInput: CreatePostInput = {
-  caption: "",
-  image: "",
-  hashtags: [],
-};
-
-/*
-under image
-delete button -> deletes image
-
-choose a google font
-*/
+import { MoreHoriz, FlagRounded, AddSharp } from "@mui/icons-material";
+import { CreatePostModal } from "./createPostModal";
 
 const bucketPosts = (posts: Post[]) => {
   const buckets: Post[][] = [[], [], [], [], []];
@@ -43,8 +33,10 @@ const bucketPosts = (posts: Post[]) => {
 };
 
 export const App = () => {
-  const [postInput, setPostInput] = useState<CreatePostInput>(initialPostInput);
   const [postIndex, setPostIndex] = useState<number | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+
+  const { palette } = useTheme();
 
   const posts = useSubscribePosts();
 
@@ -55,23 +47,57 @@ export const App = () => {
   return (
     <CssVarsProvider theme={theme}>
       {postIndex === null ? (
-        <Stack>
-          <Stack alignItems="center" spacing={1}>
+        <>
+          <Stack alignItems="center" spacing={2} mb={5}>
             <ProfilePhoto />
-            <Typography level="body-sm" fontWeight="lg">
-              richelleshim
-            </Typography>
-            <Typography level="body-sm" fontStyle="bold">
-              richelleshim
-            </Typography>
-            <Typography level="body-sm">ABOUT</Typography>
-            <Typography level="body-sm">bio</Typography>
+            <Stack direction="row" alignItems="center" spacing={0}>
+              <Typography level="h1" fontSize="sm">
+                richelleshim
+              </Typography>
+              <Dropdown>
+                <MenuButton variant="plain">
+                  <MoreHoriz />
+                </MenuButton>
+                <Menu>
+                  <MenuItem
+                    onClick={() => {
+                      setIsCreating(true);
+                    }}
+                  >
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <Typography sx={{ fontSize: "10px" }}>
+                        <AddSharp />
+                      </Typography>
+                      <Typography level="body-xs">Create Post</Typography>
+                    </Stack>
+                  </MenuItem>
+                  <MenuItem>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <Typography sx={{ fontSize: "10px" }}>
+                        <FlagRounded />
+                      </Typography>
+                      <Typography level="body-xs">Report</Typography>
+                    </Stack>
+                  </MenuItem>
+                </Menu>
+              </Dropdown>
+            </Stack>
+            <Typography level="body-sm">richelleshim</Typography>
+            <Stack alignItems="center" spacing={0.2}>
+              <Typography level="body-xs">ABOUT</Typography>
+              <Typography level="body-xs">bio</Typography>
+            </Stack>
+            <Button>
+              <Typography level="title-sm" sx={{ color: "white" }}>
+                FOLLOW
+              </Typography>
+            </Button>
           </Stack>
           <Container maxWidth="lg">
             <Stack direction="row" spacing={3}>
-              {buckets.map((bucket) => {
+              {buckets.map((bucket, i) => {
                 return (
-                  <Stack spacing={3}>
+                  <Stack spacing={3} key={i}>
                     {bucket.map((post) => {
                       return (
                         <ListItemButton
@@ -89,7 +115,7 @@ export const App = () => {
               })}
             </Stack>
           </Container>
-        </Stack>
+        </>
       ) : (
         <FullPostDisplay
           post={posts[Math.min(postIndex, posts.length - 1)]}
@@ -102,6 +128,14 @@ export const App = () => {
               ? null
               : () => setPostIndex(postIndex + 1)
           }
+        />
+      )}
+      {isCreating && (
+        <CreatePostModal
+          open={isCreating}
+          onClose={() => {
+            setIsCreating(false);
+          }}
         />
       )}
     </CssVarsProvider>

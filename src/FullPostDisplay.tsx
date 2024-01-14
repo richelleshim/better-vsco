@@ -51,7 +51,7 @@ export const FullPostDisplay = ({
         </IconButton>
       </Box>
       <Stack alignItems="center">
-        <Stack width="60%" maxWidth="800px" height="100vh">
+        <Stack width="60%" maxWidth="500px" height="100vh">
           <Stack flexGrow={1} justifyContent="center">
             <img src={post.image} />
           </Stack>
@@ -63,21 +63,26 @@ export const FullPostDisplay = ({
             >
               <Typography>richelleshim</Typography>
               <Stack direction="row">
-                {onPrev !== null && (
-                  <IconButton onClick={onPrev}>
+                <Box visibility={onPrev ? undefined : "hidden"}>
+                  <IconButton onClick={onPrev ?? undefined}>
                     <ArrowBackRounded />
                   </IconButton>
-                )}
-                {onNext !== null && (
-                  <IconButton onClick={onNext}>
+                </Box>
+                <Box visibility={onNext ? undefined : "hidden"}>
+                  <IconButton onClick={onNext ?? undefined}>
                     <ArrowForwardRounded />
                   </IconButton>
-                )}
+                </Box>
               </Stack>
             </Stack>
             <Stack alignItems="start">
-              <Button sx={{ borderRadius: "100px" }}>Follow</Button>
+              <Button size="sm" sx={{ borderRadius: "100px" }}>
+                <Typography level="body-xs" sx={{ color: "white" }}>
+                  Follow
+                </Typography>
+              </Button>
             </Stack>
+            <Typography level="body-sm">{post.caption}</Typography>
             <Typography color="neutral" level="body-xs">
               {format(post.created, "LLLL d, yyyy p")}
             </Typography>
@@ -110,7 +115,6 @@ export const FullPostDisplay = ({
                 </Menu>
               </Dropdown>
             </Stack>
-            <Typography level="h3">{post.caption}</Typography>
           </Stack>
         </Stack>
       </Stack>
