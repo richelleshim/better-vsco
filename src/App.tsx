@@ -29,7 +29,6 @@ export const App = () => {
           width="100vw"
           alignItems="center"
           justifyContent="center"
-          border="1px solid red"
         >
           <Stack spacing={2}>
             <Typography level="body-lg">Log into your account</Typography>
