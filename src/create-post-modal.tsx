@@ -9,14 +9,22 @@ import {
 import { useState } from "react";
 import { TextInput } from "./components/text-input";
 import { LabeledGroup } from "./components/labeled-group";
-import { createPost, uploadPostImage } from "./api";
+import { uploadPostImage } from "./api/storage";
+import { createPost } from "./api/post";
+import { UploadImageInput } from "./components/upload-image-input";
+import { User } from "./api/user";
 
 type CreatePostModalProps = {
+  user: User;
   open: boolean;
   onClose: () => void;
 };
 
-export const CreatePostModal = ({ open, onClose }: CreatePostModalProps) => {
+export const CreatePostModal = ({
+  user,
+  open,
+  onClose,
+}: CreatePostModalProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [caption, setCaption] = useState("");
 
@@ -27,6 +35,7 @@ export const CreatePostModal = ({ open, onClose }: CreatePostModalProps) => {
       caption,
       image: imageURL,
       hashtags: [],
+      userEmail: user.email,
     });
     onClose();
   };
@@ -39,18 +48,7 @@ export const CreatePostModal = ({ open, onClose }: CreatePostModalProps) => {
         <ModalClose />
         <Stack spacing={2}>
           <Typography>Create Post</Typography>
-          <Button component="label">
-            Upload Image
-            <input
-              type="file"
-              hidden
-              onChange={(event) => {
-                const file = event.target.files?.[0];
-                if (file === undefined) return;
-                setFile(file);
-              }}
-            />
-          </Button>
+          <UploadImageInput onFileChange={setFile} />
           {file && <img src={URL.createObjectURL(file)} />}
           <LabeledGroup title="Caption">
             <TextInput value={caption} onChange={setCaption} />

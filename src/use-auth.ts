@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { firebaseAuth } from "./global";
 import { User as FirebaseUser } from "firebase/auth";
-import { User, getUser } from "./api";
+import { User, getUser } from "./api/user";
 
 type AuthState = {
   firebaseUser: FirebaseUser | null;
@@ -16,11 +16,13 @@ const initialAuthState: AuthState = {
 //keep up updated whether or not auth or not
 export const useAuth = () => {
   const [authState, setAuthState] = useState<AuthState>(initialAuthState);
+  const [ready, setReady] = useState(false);
 
   const updateAuthState = async (firebaseUser: FirebaseUser | null) => {
     const user =
       firebaseUser?.email == null ? null : await getUser(firebaseUser.email);
     setAuthState({ firebaseUser, user });
+    setReady(true);
   };
 
   useEffect(() => {
@@ -31,5 +33,5 @@ export const useAuth = () => {
     updateAuthState(authState.firebaseUser);
   };
 
-  return { authState , refetch};
+  return { authState, refetch, ready };
 };

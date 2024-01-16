@@ -10,14 +10,16 @@ import {
   MenuButton,
   MenuItem,
   Button,
+  useColorScheme,
 } from "@mui/joy";
-import { Post, useSubscribePosts } from "./api";
-import { ProfilePhoto } from "./ProfilePhoto";
-import { FullPostDisplay } from "./FullPostDisplay";
+import { Post, useSubscribePosts } from "./api/post";
 import { MoreHoriz, AddSharp, Logout } from "@mui/icons-material";
-import { CreatePostModal } from "./createPostModal";
 import { firebaseAuth } from "./global";
 import { signOut } from "firebase/auth";
+import { FullPostDisplay } from "./full-post-display";
+import { CreatePostModal } from "./create-post-modal";
+import { User } from "./api/user";
+import { ProfilePhoto } from "./profile-photo";
 
 const bucketPosts = (posts: Post[]) => {
   const buckets: Post[][] = [[], [], [], [], []];
@@ -31,11 +33,11 @@ const bucketPosts = (posts: Post[]) => {
   return buckets;
 };
 
-export const Profile = () => {
+export const Profile = ({ user }: { user: User }) => {
   const [postIndex, setPostIndex] = useState<number | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
-  const posts = useSubscribePosts();
+  const posts = useSubscribePosts({ user });
 
   if (posts === null) return null;
 
@@ -46,13 +48,13 @@ export const Profile = () => {
       {postIndex === null ? (
         <>
           <Stack alignItems="center" spacing={2} mb={5} marginTop={15}>
-            <ProfilePhoto />
+            <ProfilePhoto image={user.profilePictureURL} />
             <Stack direction="row" alignItems="center" spacing={0}>
               <Typography level="h1" fontSize="sm">
-                richelleshim
+                {user.username}
               </Typography>
               <Dropdown>
-                <MenuButton variant="richelle">
+                <MenuButton variant="plain">
                   <MoreHoriz />
                 </MenuButton>
                 <Menu>
@@ -83,11 +85,14 @@ export const Profile = () => {
                 </Menu>
               </Dropdown>
             </Stack>
-            <Typography level="body-sm">richelleshim</Typography>
-            <Stack alignItems="center" spacing={0.2}>
-              <Typography level="body-xs">ABOUT</Typography>
-              <Typography level="body-xs">bio</Typography>
-            </Stack>
+
+            <Typography level="body-sm">{user.username}</Typography>
+            {user.about && (
+              <Stack alignItems="center" spacing={0.2}>
+                <Typography level="body-xs">ABOUT</Typography>
+                <Typography level="body-xs">{user.about}</Typography>
+              </Stack>
+            )}
             <Button>
               <Typography level="title-sm" sx={{ color: "white" }}>
                 FOLLOW
@@ -133,6 +138,7 @@ export const Profile = () => {
       )}
       {isCreating && (
         <CreatePostModal
+          user={user}
           open={isCreating}
           onClose={() => {
             setIsCreating(false);
@@ -142,3 +148,6 @@ export const Profile = () => {
     </>
   );
 };
+
+//to do: let's make profile picture changable when clicked
+//

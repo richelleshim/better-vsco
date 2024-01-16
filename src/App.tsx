@@ -1,116 +1,106 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { useAuth } from "./useAuth";
-import { Box, Button, IconButton, Stack, Typography } from "@mui/joy";
-import { TextInput } from "./components/text-input";
-import { useState } from "react";
-import { createUser } from "./api";
+import { useAuth } from "./use-auth";
+import { Button, CircularProgress, Stack, Typography } from "@mui/joy";
+import { createUser } from "./api/user";
 import { firebaseAuth } from "./global";
-import { Profile } from "./Profile";
-import { ArrowBackRounded, Google } from "@mui/icons-material";
+import { Profile } from "./profile";
+import { Google } from "@mui/icons-material";
+import { SignUpDisplay } from "./sign-up-display";
+import { uploadPostImage } from "./api/storage";
 
+const defaultProfilePictureURLs = [
+  "https://firebasestorage.googleapis.com/v0/b/better-vsco.appspot.com/o/assets%2Fdefault-profile-pics%2FScreenshot%202024-01-07%20at%209.03.56%20PM.png?alt=media",
+  "https://firebasestorage.googleapis.com/v0/b/better-vsco.appspot.com/o/assets%2Fdefault-profile-pics%2FScreenshot%202024-01-13%20at%205.29.39%20PM.png?alt=media",
+  "https://firebasestorage.googleapis.com/v0/b/better-vsco.appspot.com/o/assets%2Fdefault-profile-pics%2FScreenshot%202024-01-15%20at%201.02.46%20PM.png?alt=media",
+  "https://firebasestorage.googleapis.com/v0/b/better-vsco.appspot.com/o/assets%2Fdefault-profile-pics%2FScreenshot%202024-01-15%20at%201.03.06%20PM.png?alt=media",
+  "https://firebasestorage.googleapis.com/v0/b/better-vsco.appspot.com/o/assets%2Fdefault-profile-pics%2FScreenshot%202024-01-15%20at%201.04.01%20PM.png?alt=media",
+  "https://firebasestorage.googleapis.com/v0/b/better-vsco.appspot.com/o/assets%2Fdefault-profile-pics%2FScreenshot%202024-01-15%20at%2012.59.29%20PM.png?alt=media",
+];
+
+const randomInteger = (min: number, max: number) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+export const randomProfilePictureURL = () => {
+  const index = randomInteger(0, 5);
+  return defaultProfilePictureURLs[index];
+};
 const googleProvider = new GoogleAuthProvider();
 
 export const App = () => {
-  const [isSignIn, setIsSignIn] = useState(true);
-  const result = useAuth();
-  const { authState, refetch } = result;
+  const { authState, refetch, ready } = useAuth();
   const { firebaseUser, user } = authState;
-  const [userName, setUserName] = useState("");
 
   const onLogInGoogle = () => {
     signInWithPopup(firebaseAuth, googleProvider);
   };
 
-  if (firebaseUser?.email == null || isSignIn === true)
+  if (!ready)
     return (
-      <Stack>
-        <Stack
-          height="100vh"
-          width="100vw"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Stack spacing={2}>
-            <Typography level="body-lg">Log into your account</Typography>
-            <Button
-              sx={{ borderRadius: "100px", width: "20vw" }}
-              onClick={() => {
-                onLogInGoogle();
-                setIsSignIn(false);
-              }}
-            >
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                width="100vw"
-              >
-                Log in with Google
-                <Google />
-              </Stack>
-            </Button>
-          </Stack>
-        </Stack>
+      <Stack
+        height="100vh"
+        width="100vw"
+        alignItems="center"
+        justifyContent="center"
+        position="absolute"
+      >
+        <CircularProgress variant="plain" />;
       </Stack>
     );
 
-  const onSignUp = async () => {
-    if (firebaseUser.email === null) return;
-
-    await createUser({
-      email: firebaseUser.email,
-      username: userName,
-      about: null,
-    });
-
-    refetch();
-  };
+  if (firebaseUser?.email == null)
+    return (
+      <Stack
+        height="100vh"
+        width="100vw"
+        alignItems="center"
+        justifyContent="center"
+        position="absolute"
+      >
+        <Stack spacing={2} width="300px">
+          <Typography level="body-lg">Log into your account</Typography>
+          <Button
+            sx={{ borderRadius: "100px" }}
+            onClick={async () => {
+              onLogInGoogle();
+            }}
+          >
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              width="100vw"
+            >
+              Log in with Google
+              <Google />
+            </Stack>
+          </Button>
+        </Stack>
+      </Stack>
+    );
 
   if (user === null)
     return (
-      <Stack direction="row">
-        <Stack
-          height="100vh"
-          width="30vw"
-          justifyContent="center"
-          alignItems="flex-start"
-          sx={{ backgroundColor: "black" }}
-          spacing={4}
-        >
-          <Stack direction="row">
-            <IconButton variant="richelle" onClick={()=>{setIsSignIn(true)}}>
-              <ArrowBackRounded sx={{ color: "white" }} />
-              <Typography sx={{ color: "white" }} >Back</Typography>
-            </IconButton>
-          </Stack>
-        </Stack>
+      <SignUpDisplay
+        onSignUp={async (username, profilePictureFile) => {
+          if (firebaseUser.email === null) return;
+          
+          const imageURL =
+            profilePictureFile === null
+              ? randomProfilePictureURL()
+              : await uploadPostImage(profilePictureFile);
 
-        <Stack
-          height="100vh"
-          width="40vw"
-          alignItems="center"
-          justifyContent="center"
-          sx={{ backgroundColor: "white" }}
-          spacing={4}
-        >
-          <Typography level="h3" sx={{ color: "black" }}>
-            Complete Sign Up
-          </Typography>
-          <Stack spacing={2}>
-            <Typography level="body-sm" sx={{ color: "grey" }}>
-              Username
-            </Typography>
-            <TextInput onChange={setUserName} value={userName} />
-            <Button
-              onClick={onSignUp}
-              sx={{ color: "white", borderRadius: "100px" }}
-            >
-              Sign Up
-            </Button>
-          </Stack>
-        </Stack>
-      </Stack>
+          await createUser({
+            email: firebaseUser.email,
+            username,
+            about: null,
+            profilePictureURL: imageURL,
+          });
+
+          refetch();
+        }}
+      />
     );
 
-  return <Profile />;
+  return <Profile user={user}/>;
 };

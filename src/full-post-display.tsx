@@ -9,7 +9,7 @@ import {
   Stack,
   Typography,
 } from "@mui/joy";
-import { Post, deletePost } from "./api";
+import { Post, deletePost } from "./api/post";
 import {
   ArrowBackRounded,
   ArrowForwardRounded,
