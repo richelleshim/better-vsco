@@ -60,7 +60,7 @@ export type Post = {
   created: Date
   image: string
   hashtags: string[]
-  userEmail: string
+  user: User
 }
 
 export const useSubscribePosts = ({ user }: { user: User | null }) => {
@@ -84,6 +84,7 @@ export const useSubscribePosts = ({ user }: { user: User | null }) => {
         return {
           ...doc,
           index,
+          user,
         }
       })
 

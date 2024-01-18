@@ -41,7 +41,16 @@ export const FullPostDisplay = ({ post, onClose, onNext, onPrev }: FullPostDispl
       }}
     >
       <Box position="absolute" top="25px" left="25px">
-        <IconButton size="lg" onClick={onClose}>
+        <IconButton
+          sx={{
+            ":hover": {
+              backgroundColor: "white",
+              cursor: "pointer",
+            },
+          }}
+          size="lg"
+          onClick={onClose}
+        >
           <Close />
         </IconButton>
       </Box>
@@ -51,8 +60,12 @@ export const FullPostDisplay = ({ post, onClose, onNext, onPrev }: FullPostDispl
             <img src={post.image} />
           </Stack>
           <Stack spacing={1} py={3}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <Typography>richelleshim</Typography>
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Typography>{post.user.username}</Typography>
               <Stack direction="row">
                 <Box visibility={onPrev ? undefined : "hidden"}>
                   <IconButton onClick={onPrev ?? undefined}>
