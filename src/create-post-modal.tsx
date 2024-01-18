@@ -49,7 +49,9 @@ export const CreatePostModal = ({
         <Stack spacing={2}>
           <Typography>Create Post</Typography>
           <UploadImageInput onFileChange={setFile} />
-          {file && <img src={URL.createObjectURL(file)} />}
+          <Stack alignItems="center">
+            {file && <img width="300px" src={URL.createObjectURL(file)} />}
+          </Stack>
           <LabeledGroup title="Caption">
             <TextInput value={caption} onChange={setCaption} />
           </LabeledGroup>
