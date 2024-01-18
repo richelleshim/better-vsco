@@ -65,7 +65,7 @@ export const Profile = ({ user }: { user: User }) => {
                 {subscribedUser.username}
               </Typography>
               <Dropdown>
-                <MenuButton variant="plain" sx={{paddingX:"2px", paddingY:"2px"}}>
+                <MenuButton variant="plain" sx={{ paddingX: "2px", paddingY: "2px" }}>
                   <MoreHoriz />
                 </MenuButton>
                 <Menu>

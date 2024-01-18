@@ -85,7 +85,7 @@ export const useSubscribePosts = ({ user }: { user: User | null }) => {
           ...doc,
           index,
           user,
-        }
+            }
       })
 
       setPosts(posts)
