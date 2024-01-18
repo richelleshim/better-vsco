@@ -53,7 +53,7 @@ export const Profile = ({ user }: { user: User }) => {
     <>
       {postIndex === null ? (
         <>
-          <Stack alignItems="center" spacing={2} mb={5} marginTop={15}>
+          <Stack alignItems="center" spacing={1} mb={5} marginTop={15}>
             <ProfilePhoto
               image={subscribedUser.profilePictureURL}
               onClick={() => {
@@ -65,7 +65,7 @@ export const Profile = ({ user }: { user: User }) => {
                 {subscribedUser.username}
               </Typography>
               <Dropdown>
-                <MenuButton variant="plain">
+                <MenuButton variant="plain" sx={{paddingX:"2px", paddingY:"2px"}}>
                   <MoreHoriz />
                 </MenuButton>
                 <Menu>
