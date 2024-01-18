@@ -1,12 +1,13 @@
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth"
-import { useAuth } from "./use-auth"
-import { Button, CircularProgress, Stack, Typography } from "@mui/joy"
-import { createUser } from "./api/user"
-import { firebaseAuth } from "./global"
-import { Profile } from "./profile"
-import { Google } from "@mui/icons-material"
-import { SignUpDisplay } from "./sign-up-display"
-import { uploadPostImage } from "./api/storage"
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { useAuth } from "./use-auth";
+import { Button, CircularProgress, Stack, Typography } from "@mui/joy";
+import { createUser, User } from "./api/user";
+import { firebaseAuth } from "./global";
+import { Profile } from "./profile";
+import { Google } from "@mui/icons-material";
+import { SignUpDisplay } from "./sign-up-display";
+import { uploadPostImage } from "./api/storage";
+import { useState } from "react";
 
 const defaultProfilePictureURLs = [
   "https://firebasestorage.googleapis.com/v0/b/better-vsco.appspot.com/o/assets%2Fdefault-profile-pics%2FScreenshot%202024-01-07%20at%209.03.56%20PM.png?alt=media",
@@ -15,25 +16,26 @@ const defaultProfilePictureURLs = [
   "https://firebasestorage.googleapis.com/v0/b/better-vsco.appspot.com/o/assets%2Fdefault-profile-pics%2FScreenshot%202024-01-15%20at%201.03.06%20PM.png?alt=media",
   "https://firebasestorage.googleapis.com/v0/b/better-vsco.appspot.com/o/assets%2Fdefault-profile-pics%2FScreenshot%202024-01-15%20at%201.04.01%20PM.png?alt=media",
   "https://firebasestorage.googleapis.com/v0/b/better-vsco.appspot.com/o/assets%2Fdefault-profile-pics%2FScreenshot%202024-01-15%20at%2012.59.29%20PM.png?alt=media",
-]
+];
 
 const randomInteger = (min: number, max: number) => {
-  return Math.floor(Math.random() * (max - min + 1)) + min
-}
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
 
 export const randomProfilePictureURL = () => {
-  const index = randomInteger(0, 5)
-  return defaultProfilePictureURLs[index]
-}
-const googleProvider = new GoogleAuthProvider()
+  const index = randomInteger(0, 5);
+  return defaultProfilePictureURLs[index];
+};
+const googleProvider = new GoogleAuthProvider();
 
 export const App = () => {
-  const { authState, refetch, ready } = useAuth()
-  const { firebaseUser, user } = authState
+  const { authState, refetch, ready } = useAuth();
+  const { firebaseUser, user } = authState;
+  const [viewingUser, setViewingUser] = useState<User | null>(null);
 
   const onLogInGoogle = () => {
-    signInWithPopup(firebaseAuth, googleProvider)
-  }
+    signInWithPopup(firebaseAuth, googleProvider);
+  };
 
   if (!ready)
     return (
@@ -46,7 +48,7 @@ export const App = () => {
       >
         <CircularProgress variant="plain" />;
       </Stack>
-    )
+    );
 
   if (firebaseUser?.email == null)
     return (
@@ -62,7 +64,7 @@ export const App = () => {
           <Button
             sx={{ borderRadius: "100px" }}
             onClick={async () => {
-              onLogInGoogle()
+              onLogInGoogle();
             }}
           >
             <Stack direction="row" justifyContent="space-between" alignItems="center" width="100vw">
@@ -72,30 +74,39 @@ export const App = () => {
           </Button>
         </Stack>
       </Stack>
-    )
+    );
 
   if (user === null)
     return (
       <SignUpDisplay
         onSignUp={async (username, profilePictureFile) => {
-          if (firebaseUser.email === null) return
+          if (firebaseUser.email === null) return;
 
           const imageURL =
             profilePictureFile === null
               ? randomProfilePictureURL()
-              : await uploadPostImage(profilePictureFile)
+              : await uploadPostImage(profilePictureFile);
 
           await createUser({
             email: firebaseUser.email,
             username,
             about: null,
             profilePictureURL: imageURL,
-          })
+          });
 
-          refetch()
+          refetch();
         }}
       />
-    )
+    );
 
-  return <Profile user={user} />
-}
+  const email = viewingUser?.email ?? user.email;
+
+  return (
+    <Profile
+      email={email}
+      onUserChange={(viewingUser) => {
+        setViewingUser(viewingUser); ;
+      }}
+    />
+  );
+};

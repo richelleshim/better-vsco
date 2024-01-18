@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState } from "react";
 
 import {
   Container,
@@ -10,44 +10,55 @@ import {
   MenuButton,
   MenuItem,
   Button,
-} from "@mui/joy"
-import { Post, useSubscribePosts } from "./api/post"
-import { MoreHoriz, AddSharp, Logout } from "@mui/icons-material"
-import { firebaseAuth } from "./global"
-import { signOut } from "firebase/auth"
-import { FullPostDisplay } from "./full-post-display"
-import { CreatePostModal } from "./create-post-modal"
-import { User, useSubscribeUser } from "./api/user"
-import { ProfilePhoto } from "./profile-photo"
-import { EditProfilePictureModal } from "./edit-profile-picture-modal"
+} from "@mui/joy";
+import { Post, useSubscribePosts } from "./api/post";
+import { MoreHoriz, AddSharp, Logout } from "@mui/icons-material";
+import { firebaseAuth } from "./global";
+import { signOut } from "firebase/auth";
+import { FullPostDisplay } from "./full-post-display";
+import { CreatePostModal } from "./create-post-modal";
+import { User, useSubscribeUsers } from "./api/user";
+import { ProfilePhoto } from "./profile-photo";
+import { EditProfilePictureModal } from "./edit-profile-picture-modal";
 
 const bucketPosts = (posts: Post[]) => {
-  const buckets: Post[][] = [[], [], [], [], []]
+  const buckets: Post[][] = [[], [], [], [], []];
 
   posts.forEach((post, index) => {
-    const bucketIndex = index % 5
-    const bucket = buckets[bucketIndex]
-    bucket.push(post)
-  })
+    const bucketIndex = index % 5;
+    const bucket = buckets[bucketIndex];
+    bucket.push(post);
+  });
 
-  return buckets
-}
+  return buckets;
+};
 
-export const Profile = ({ user }: { user: User }) => {
-  const subscribedUser = useSubscribeUser(user.email)
+export const Profile = ({
+  email,
+  onUserChange,
+}: {
+  email: string;
+  onUserChange: (user: User) => void;
+}) => {
+  const users = useSubscribeUsers();
 
-  console.log(subscribedUser)
+  const [postIndex, setPostIndex] = useState<number | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [isEditingPfp, setIsEditingPfp] = useState(false);
+  const [isViewingUsers, setIsViewingUsers] = useState(false);
 
-  const [postIndex, setPostIndex] = useState<number | null>(null)
-  const [isCreating, setIsCreating] = useState(false)
-  const [isEditingPfp, setIsEditingPfp] = useState(false)
-  const posts = useSubscribePosts({ user: subscribedUser })
+  const user =
+    users?.find((user) => {
+      return email === user.email;
+    }) ?? null;
 
-  if (posts === null) return null
+  const posts = useSubscribePosts({ user });
 
-  if (subscribedUser === null) return null
+  if (posts === null) return null;
+  if (user === null) return null;
+  if (users === null) return null;
 
-  const buckets = bucketPosts(posts)
+  const buckets = bucketPosts(posts);
 
   return (
     <>
@@ -55,14 +66,14 @@ export const Profile = ({ user }: { user: User }) => {
         <>
           <Stack alignItems="center" spacing={1} mb={5} marginTop={15}>
             <ProfilePhoto
-              image={subscribedUser.profilePictureURL}
+              image={user.profilePictureURL}
               onClick={() => {
-                setIsEditingPfp(true)
+                setIsEditingPfp(true);
               }}
             />
             <Stack direction="row" alignItems="center" spacing={0}>
               <Typography level="h1" fontSize="sm">
-                {subscribedUser.username}
+                {user.username}
               </Typography>
               <Dropdown>
                 <MenuButton variant="plain" sx={{ paddingX: "2px", paddingY: "2px" }}>
@@ -71,7 +82,7 @@ export const Profile = ({ user }: { user: User }) => {
                 <Menu>
                   <MenuItem
                     onClick={() => {
-                      setIsCreating(true)
+                      setIsCreating(true);
                     }}
                   >
                     <Stack direction="row" alignItems="center" spacing={1}>
@@ -83,7 +94,7 @@ export const Profile = ({ user }: { user: User }) => {
                   </MenuItem>
                   <MenuItem
                     onClick={() => {
-                      signOut(firebaseAuth)
+                      signOut(firebaseAuth);
                     }}
                   >
                     <Stack direction="row" alignItems="center" spacing={1}>
@@ -96,12 +107,11 @@ export const Profile = ({ user }: { user: User }) => {
                 </Menu>
               </Dropdown>
             </Stack>
-
-            <Typography level="body-sm">{subscribedUser.username}</Typography>
-            {subscribedUser.about && (
+            <Typography level="body-sm">{user.username}</Typography>
+            {user.about && (
               <Stack alignItems="center" spacing={0.2}>
                 <Typography level="body-xs">ABOUT</Typography>
-                <Typography level="body-xs">{subscribedUser.about}</Typography>
+                <Typography level="body-xs">{user.about}</Typography>
               </Stack>
             )}
             <Button>
@@ -110,34 +120,71 @@ export const Profile = ({ user }: { user: User }) => {
               </Typography>
             </Button>
           </Stack>
-          <Container maxWidth="lg">
-            <Stack direction="row" spacing={3}>
-              {buckets.map((bucket, i) => {
+          <Stack alignItems="center">
+            <Stack direction="row" spacing={1}>
+              <Button
+                variant={!isViewingUsers ? "solid" : "plain"}
+                onClick={() => {
+                  setIsViewingUsers(false);
+                }}
+              >
+                Gallery
+              </Button>
+              <Button
+                variant={isViewingUsers ? "solid" : "plain"}
+                onClick={() => {
+                  setIsViewingUsers(true);
+                }}
+              >
+                Collection
+              </Button>
+            </Stack>
+          </Stack>
+          {isViewingUsers ? (
+            <Stack>
+              {users.map((user) => {
                 return (
-                  <Stack spacing={3} key={i}>
-                    {bucket.map((post) => {
-                      return (
-                        <ListItemButton
-                          key={post.id}
-                          onClick={() => {
-                            setPostIndex(post.index)
-                          }}
-                        >
-                          <img src={post.image} width="200px" />
-                        </ListItemButton>
-                      )
-                    })}
-                  </Stack>
-                )
+                  <Button
+                    key={user.username}
+                    onClick={() => {
+                      onUserChange(user);;
+                    }}
+                  >
+                    {user.username}
+                  </Button>
+                );
               })}
             </Stack>
-          </Container>
+          ) : (
+            <Container maxWidth="lg">
+              <Stack direction="row" spacing={3}>
+                {buckets.map((bucket, i) => {
+                  return (
+                    <Stack spacing={3} key={i}>
+                      {bucket.map((post) => {
+                        return (
+                          <ListItemButton
+                            key={post.id}
+                            onClick={() => {
+                              setPostIndex(post.index);
+                            }}
+                          >
+                            <img src={post.image} width="200px" />
+                          </ListItemButton>
+                        );
+                      })}
+                    </Stack>
+                  );
+                })}
+              </Stack>
+            </Container>
+          )}
         </>
       ) : (
         <FullPostDisplay
           post={posts[Math.min(postIndex, posts.length - 1)]}
           onClose={() => {
-            setPostIndex(null)
+            setPostIndex(null);
           }}
           onPrev={postIndex === 0 ? null : () => setPostIndex(postIndex - 1)}
           onNext={postIndex === posts.length - 1 ? null : () => setPostIndex(postIndex + 1)}
@@ -148,22 +195,22 @@ export const Profile = ({ user }: { user: User }) => {
           user={user}
           open={isCreating}
           onClose={() => {
-            setIsCreating(false)
+            setIsCreating(false);
           }}
         />
       )}
       {isEditingPfp && (
         <EditProfilePictureModal
-          user={subscribedUser}
+          user={user}
           open={isEditingPfp}
           onClose={() => {
-            setIsEditingPfp(false)
+            setIsEditingPfp(false);
           }}
         />
       )}
     </>
-  )
-}
+  );
+};
 
 //to do: let's make profile picture changable when clicked
 //

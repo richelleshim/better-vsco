@@ -1,5 +1,5 @@
 import { firebaseStore } from "../global"
-import { doc, setDoc, getDoc, updateDoc, onSnapshot } from "firebase/firestore"
+import { doc, setDoc, getDoc, updateDoc, onSnapshot, collection } from "firebase/firestore"
 import { z } from "zod"
 import { Collection } from "./types"
 import { useEffect, useState } from "react"
@@ -62,17 +62,20 @@ export const updateUser = async (input: UpdateUserInput) => {
   await updateDoc(doc(firebaseStore, Collection.USERS, email), update)
 }
 
-export const useSubscribeUser = (email: string) => {
-  const [user, setUser] = useState<User | null>(null)
+export const useSubscribeUsers = () => {
+  const [users, setUsers] = useState<User[] | null>(null)
 
   useEffect(() => {
-    onSnapshot(doc(firebaseStore, Collection.USERS, email), (doc) => {
-      const userData = doc.data()
-      const user = userData === undefined ? null : UserSchema.parse(userData)
-      setUser(user)
+    const usersPath = collection(firebaseStore, Collection.USERS)
+
+    onSnapshot(usersPath, (snapshot) => {
+      const userData = snapshot.docs.map((doc):  User => {
+        return UserSchema.parse(doc.data())
+      })
+      
+      setUsers(userData);
     })
   }, [])
 
-  return user
+  return users
 }
-
