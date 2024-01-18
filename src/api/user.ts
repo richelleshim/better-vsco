@@ -1,7 +1,8 @@
 import { firebaseStore } from "../global";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc, onSnapshot } from "firebase/firestore";
 import { z } from "zod";
 import { Collection } from "./types";
+import { useEffect, useState } from "react";
 
 export const UserSchema = z.object({
   email: z.string(),
@@ -32,7 +33,7 @@ export const createUser = async ({
     username,
     about,
     reportCount: 0,
-    profilePictureURL
+    profilePictureURL,
   };
 
   const userPath = doc(firebaseStore, Collection.USERS, email);
@@ -48,4 +49,29 @@ export const getUser = async (email: string) => {
   const userData = userDoc.data();
 
   return userData === undefined ? null : UserSchema.parse(userData);
+};
+
+export type UpdateUserInput = {
+  about: string | null;
+  profilePictureURL: string;
+  email: string;
+};
+// ~/users/<email>
+export const updateUser = async (input: UpdateUserInput) => {
+  const { email, ...update } = input;
+  await updateDoc(doc(firebaseStore, Collection.USERS, email), update);
+};
+
+export const useSubscribeUser = (email: string) => {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    onSnapshot(doc(firebaseStore, Collection.USERS, email), (doc) => {
+      const userData = doc.data();
+      const user = userData === undefined ? null : UserSchema.parse(userData);
+      setUser(user);
+    });
+  }, []);
+
+  return user;
 };

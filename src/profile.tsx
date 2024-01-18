@@ -10,7 +10,6 @@ import {
   MenuButton,
   MenuItem,
   Button,
-  useColorScheme,
 } from "@mui/joy";
 import { Post, useSubscribePosts } from "./api/post";
 import { MoreHoriz, AddSharp, Logout } from "@mui/icons-material";
@@ -18,8 +17,9 @@ import { firebaseAuth } from "./global";
 import { signOut } from "firebase/auth";
 import { FullPostDisplay } from "./full-post-display";
 import { CreatePostModal } from "./create-post-modal";
-import { User } from "./api/user";
+import { User, useSubscribeUser } from "./api/user";
 import { ProfilePhoto } from "./profile-photo";
+import { EditProfilePictureModal } from "./edit-profile-picture-modal";
 
 const bucketPosts = (posts: Post[]) => {
   const buckets: Post[][] = [[], [], [], [], []];
@@ -34,12 +34,18 @@ const bucketPosts = (posts: Post[]) => {
 };
 
 export const Profile = ({ user }: { user: User }) => {
+  const subscribedUser = useSubscribeUser(user.email);
+
+  console.log(subscribedUser);
+
   const [postIndex, setPostIndex] = useState<number | null>(null);
   const [isCreating, setIsCreating] = useState(false);
-
-  const posts = useSubscribePosts({ user });
+  const [isEditingPfp, setIsEditingPfp] = useState(false);
+  const posts = useSubscribePosts({ user: subscribedUser });
 
   if (posts === null) return null;
+
+  if (subscribedUser === null) return null;
 
   const buckets = bucketPosts(posts);
 
@@ -48,10 +54,15 @@ export const Profile = ({ user }: { user: User }) => {
       {postIndex === null ? (
         <>
           <Stack alignItems="center" spacing={2} mb={5} marginTop={15}>
-            <ProfilePhoto image={user.profilePictureURL} />
+            <ProfilePhoto
+              image={subscribedUser.profilePictureURL}
+              onClick={() => {
+                setIsEditingPfp(true);
+              }}
+            />
             <Stack direction="row" alignItems="center" spacing={0}>
               <Typography level="h1" fontSize="sm">
-                {user.username}
+                {subscribedUser.username}
               </Typography>
               <Dropdown>
                 <MenuButton variant="plain">
@@ -86,11 +97,11 @@ export const Profile = ({ user }: { user: User }) => {
               </Dropdown>
             </Stack>
 
-            <Typography level="body-sm">{user.username}</Typography>
-            {user.about && (
+            <Typography level="body-sm">{subscribedUser.username}</Typography>
+            {subscribedUser.about && (
               <Stack alignItems="center" spacing={0.2}>
                 <Typography level="body-xs">ABOUT</Typography>
-                <Typography level="body-xs">{user.about}</Typography>
+                <Typography level="body-xs">{subscribedUser.about}</Typography>
               </Stack>
             )}
             <Button>
@@ -142,6 +153,15 @@ export const Profile = ({ user }: { user: User }) => {
           open={isCreating}
           onClose={() => {
             setIsCreating(false);
+          }}
+        />
+      )}
+      {isEditingPfp && (
+        <EditProfilePictureModal
+          user={subscribedUser}
+          open={isEditingPfp}
+          onClose={() => {
+            setIsEditingPfp(false);
           }}
         />
       )}

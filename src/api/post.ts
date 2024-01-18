@@ -65,13 +65,15 @@ export type Post = {
   userEmail: string;
 };
 
-export const useSubscribePosts = ({ user }: { user: User }) => {
+export const useSubscribePosts = ({ user }: { user: User | null }) => {
   const [posts, setPosts] = useState<Post[] | null>(null);
-  const postsPath = collection(firebaseStore, Collection.POSTS);
-  const postsQuery = query(postsPath, where("userEmail", "==", user.email));
 
   useEffect(() => {
-    onSnapshot(postsQuery, (snapshot) => {
+    if (user === null) return;
+
+    const postsPath = collection(firebaseStore, Collection.POSTS);
+    const postsQuery = query(postsPath, where("userEmail", "==", user.email));
+    return onSnapshot(postsQuery, (snapshot) => {
       const baseDocs = snapshot.docs.map((doc) => {
         return PostSchema.parse(doc.data());
       });
@@ -89,7 +91,7 @@ export const useSubscribePosts = ({ user }: { user: User }) => {
 
       setPosts(posts);
     });
-  }, []);
+  }, [user]);
 
   return posts;
 };
