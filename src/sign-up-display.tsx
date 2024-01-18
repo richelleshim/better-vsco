@@ -1,18 +1,18 @@
-import { ArrowBackRounded } from "@mui/icons-material";
-import { Box, Typography, Stack, Button } from "@mui/joy";
-import { signOut } from "firebase/auth";
-import { TextInput } from "./components/text-input";
-import { UploadImageInput } from "./components/upload-image-input";
-import { firebaseAuth } from "./global";
-import { useState } from "react";
+import { ArrowBackRounded } from "@mui/icons-material"
+import { Box, Typography, Stack, Button } from "@mui/joy"
+import { signOut } from "firebase/auth"
+import { TextInput } from "./components/text-input"
+import { UploadImageInput } from "./components/upload-image-input"
+import { firebaseAuth } from "./global"
+import { useState } from "react"
 
 export const SignUpDisplay = ({
   onSignUp,
 }: {
-  onSignUp: (username: string, profilePictureURL: File | null) => void;
+  onSignUp: (username: string, profilePictureURL: File | null) => void
 }) => {
-  const [userName, setUserName] = useState("");
-  const [file, setFile] = useState<File | null>(null);
+  const [userName, setUserName] = useState("")
+  const [file, setFile] = useState<File | null>(null)
 
   return (
     <Stack direction="row" position="absolute">
@@ -25,7 +25,7 @@ export const SignUpDisplay = ({
       >
         <div
           onClick={() => {
-            signOut(firebaseAuth);
+            signOut(firebaseAuth)
           }}
         >
           <Box
@@ -70,7 +70,7 @@ export const SignUpDisplay = ({
             {file && <img src={URL.createObjectURL(file)} />}
             <Button
               onClick={() => {
-                onSignUp(userName, file);
+                onSignUp(userName, file)
               }}
               sx={{ color: "white", borderRadius: "100px" }}
             >
@@ -80,5 +80,5 @@ export const SignUpDisplay = ({
         </Stack>
       </Stack>
     </Stack>
-  );
-};
+  )
+}

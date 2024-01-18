@@ -1,12 +1,6 @@
-import { Box } from "@mui/joy";
+import { Box } from "@mui/joy"
 
-export const ProfilePhoto = ({
-  image,
-  onClick,
-}: {
-  image: string;
-  onClick: () => void;
-}) => {
+export const ProfilePhoto = ({ image, onClick }: { image: string; onClick: () => void }) => {
   return (
     // <Button
     // variant="richelle">
@@ -33,5 +27,5 @@ export const ProfilePhoto = ({
       />
     </Box>
     // </Button>
-  );
-};
+  )
+}

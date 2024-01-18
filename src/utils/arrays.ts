@@ -30,11 +30,7 @@ export const diffCount = (diff: Diff<any>) => {
   return fst.length + snd.length + both.length
 }
 
-export const createDiff = <T>({
-  fst = [],
-  snd = [],
-  both = [],
-}: Partial<Diff<T>>): Diff<T> => {
+export const createDiff = <T>({ fst = [], snd = [], both = [] }: Partial<Diff<T>>): Diff<T> => {
   return {
     fst,
     snd,
@@ -42,11 +38,7 @@ export const createDiff = <T>({
   }
 }
 
-export const diff = <K extends Hashable, T>(
-  fst: T[],
-  snd: T[],
-  getKey: (x: T) => K,
-): Diff<T> => {
+export const diff = <K extends Hashable, T>(fst: T[], snd: T[], getKey: (x: T) => K): Diff<T> => {
   const prevIds = new Set(fst.map(getKey))
   const nextIds = new Set(snd.map(getKey))
 
@@ -86,7 +78,7 @@ export const partition = <T>(items: T[], bucket_size: number) => {
   const len = Math.ceil(items.length / bucket_size)
 
   return [...Array(len).keys()].map((i) => {
-      const offset = i * bucket_size
-      return items.slice(offset, offset + bucket_size)
+    const offset = i * bucket_size
+    return items.slice(offset, offset + bucket_size)
   })
 }

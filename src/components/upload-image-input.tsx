@@ -1,9 +1,9 @@
-import { Button, Typography } from "@mui/joy";
+import { Button, Typography } from "@mui/joy"
 
 export const UploadImageInput = ({
   onFileChange,
 }: {
-  onFileChange: (file: File | null) => void;
+  onFileChange: (file: File | null) => void
 }) => {
   return (
     <Button component="label" sx={{ color: "DarkGray" }}>
@@ -12,11 +12,11 @@ export const UploadImageInput = ({
         type="file"
         hidden
         onChange={(event) => {
-          const file = event.target.files?.[0];
-          if (file === undefined) return;
-          onFileChange(file);
+          const file = event.target.files?.[0]
+          if (file === undefined) return
+          onFileChange(file)
         }}
       />
     </Button>
-  );
-};
+  )
+}

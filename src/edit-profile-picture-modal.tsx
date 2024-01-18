@@ -1,46 +1,35 @@
-import {
-  Button,
-  Modal,
-  ModalClose,
-  ModalDialog,
-  Stack,
-  Typography,
-} from "@mui/joy";
-import { useState } from "react";
-import { uploadPostImage } from "./api/storage";
-import { UploadImageInput } from "./components/upload-image-input";
-import { UpdateUserInput, User, updateUser } from "./api/user";
-import { TextInput } from "./components/text-input";
-import { LabeledGroup } from "./components/labeled-group";
+import { Button, Modal, ModalClose, ModalDialog, Stack, Typography } from "@mui/joy"
+import { useState } from "react"
+import { uploadPostImage } from "./api/storage"
+import { UploadImageInput } from "./components/upload-image-input"
+import { UpdateUserInput, User, updateUser } from "./api/user"
+import { TextInput } from "./components/text-input"
+import { LabeledGroup } from "./components/labeled-group"
 
 type EditProfilePictureModalProp = {
-  user: User;
-  open: boolean;
-  onClose: () => void;
-};
+  user: User
+  open: boolean
+  onClose: () => void
+}
 
-export const EditProfilePictureModal = ({
-  user,
-  open,
-  onClose,
-}: EditProfilePictureModalProp) => {
-  const [profilePicture, setProfilePicture] = useState<File | null>(null);
-  const [about, setAbout] = useState("");
+export const EditProfilePictureModal = ({ user, open, onClose }: EditProfilePictureModalProp) => {
+  const [profilePicture, setProfilePicture] = useState<File | null>(null)
+  const [about, setAbout] = useState("")
 
   const onSave = async () => {
-    if (profilePicture === null) return;
-    const imageURL = await uploadPostImage(profilePicture);
+    if (profilePicture === null) return
+    const imageURL = await uploadPostImage(profilePicture)
     const input: UpdateUserInput = {
       about: about === "" ? null : about,
       profilePictureURL: imageURL,
       email: user.email,
-    };
-    await updateUser(input);
+    }
+    await updateUser(input)
 
-    onClose();
-  };
+    onClose()
+  }
 
-  const isValidInput = profilePicture !== null;
+  const isValidInput = profilePicture !== null
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -59,5 +48,5 @@ export const EditProfilePictureModal = ({
         </Stack>
       </ModalDialog>
     </Modal>
-  );
-};
+  )
+}

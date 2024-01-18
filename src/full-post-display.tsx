@@ -8,8 +8,8 @@ import {
   MenuItem,
   Stack,
   Typography,
-} from "@mui/joy";
-import { Post, deletePost } from "./api/post";
+} from "@mui/joy"
+import { Post, deletePost } from "./api/post"
 import {
   ArrowBackRounded,
   ArrowForwardRounded,
@@ -17,22 +17,17 @@ import {
   DeleteForever,
   EditRounded,
   MoreHoriz,
-} from "@mui/icons-material";
-import { format } from "date-fns";
+} from "@mui/icons-material"
+import { format } from "date-fns"
 
 type FullPostDisplayProps = {
-  post: Post;
-  onClose: () => void;
-  onNext: (() => void) | null;
-  onPrev: (() => void) | null;
-};
+  post: Post
+  onClose: () => void
+  onNext: (() => void) | null
+  onPrev: (() => void) | null
+}
 
-export const FullPostDisplay = ({
-  post,
-  onClose,
-  onNext,
-  onPrev,
-}: FullPostDisplayProps) => {
+export const FullPostDisplay = ({ post, onClose, onNext, onPrev }: FullPostDisplayProps) => {
   return (
     <Box
       sx={{
@@ -56,11 +51,7 @@ export const FullPostDisplay = ({
             <img src={post.image} />
           </Stack>
           <Stack spacing={1} py={3}>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-            >
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Typography>richelleshim</Typography>
               <Stack direction="row">
                 <Box visibility={onPrev ? undefined : "hidden"}>
@@ -102,7 +93,7 @@ export const FullPostDisplay = ({
                   </MenuItem>
                   <MenuItem
                     onClick={() => {
-                      deletePost(post.id);
+                      deletePost(post.id)
                     }}
                   >
                     <Stack direction="row" alignItems="center" spacing={1}>
@@ -119,5 +110,5 @@ export const FullPostDisplay = ({
         </Stack>
       </Stack>
     </Box>
-  );
-};
+  )
+}

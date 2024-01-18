@@ -1,46 +1,35 @@
-import {
-  Button,
-  Modal,
-  ModalClose,
-  ModalDialog,
-  Stack,
-  Typography,
-} from "@mui/joy";
-import { useState } from "react";
-import { TextInput } from "./components/text-input";
-import { LabeledGroup } from "./components/labeled-group";
-import { uploadPostImage } from "./api/storage";
-import { createPost } from "./api/post";
-import { UploadImageInput } from "./components/upload-image-input";
-import { User } from "./api/user";
+import { Button, Modal, ModalClose, ModalDialog, Stack, Typography } from "@mui/joy"
+import { useState } from "react"
+import { TextInput } from "./components/text-input"
+import { LabeledGroup } from "./components/labeled-group"
+import { uploadPostImage } from "./api/storage"
+import { createPost } from "./api/post"
+import { UploadImageInput } from "./components/upload-image-input"
+import { User } from "./api/user"
 
 type CreatePostModalProps = {
-  user: User;
-  open: boolean;
-  onClose: () => void;
-};
+  user: User
+  open: boolean
+  onClose: () => void
+}
 
-export const CreatePostModal = ({
-  user,
-  open,
-  onClose,
-}: CreatePostModalProps) => {
-  const [file, setFile] = useState<File | null>(null);
-  const [caption, setCaption] = useState("");
+export const CreatePostModal = ({ user, open, onClose }: CreatePostModalProps) => {
+  const [file, setFile] = useState<File | null>(null)
+  const [caption, setCaption] = useState("")
 
   const onCreate = async () => {
-    if (file === null) return;
-    const imageURL = await uploadPostImage(file);
+    if (file === null) return
+    const imageURL = await uploadPostImage(file)
     await createPost({
       caption,
       image: imageURL,
       hashtags: [],
       userEmail: user.email,
-    });
-    onClose();
-  };
+    })
+    onClose()
+  }
 
-  const isValidInput = file !== null;
+  const isValidInput = file !== null
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -59,5 +48,5 @@ export const CreatePostModal = ({
         </Stack>
       </ModalDialog>
     </Modal>
-  );
-};
+  )
+}

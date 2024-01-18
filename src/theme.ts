@@ -1,4 +1,4 @@
-import { extendTheme } from "@mui/joy/styles";
+import { extendTheme } from "@mui/joy/styles"
 
 export const theme = extendTheme({
   fontFamily: {
@@ -46,6 +46,6 @@ export const theme = extendTheme({
       },
     },
   },
-});
+})
 
 // Then, pass it to `<CssVarsProvider theme={theme}>`.
