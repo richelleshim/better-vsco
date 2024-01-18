@@ -9,5 +9,4 @@ type EditPostModalProp = {
 
 export const EditPostModal = ({ post, open, onClose }: EditPostModalProp) => {
   const [editingPost, setEditingPost] = useState<PostSchema | null>(null);
-  
 };
