@@ -1,5 +1,4 @@
 {
-  
   "name": "better-vsco",
   "private": true,
   "version": "0.0.0",
@@ -41,5 +40,4 @@
     "typescript": "^5.2.2",
     "vite": "^5.0.8"
   }
-
 }
