@@ -1,6 +1,6 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useAuth } from "./use-auth";
-import { Button, CircularProgress, Stack, Typography } from "@mui/joy";
+import { Box, Button, CircularProgress, Container, Stack, Typography } from "@mui/joy";
 import { createUser, User } from "./api/user";
 import { firebaseAuth } from "./global";
 import { Profile } from "./profile";
@@ -102,11 +102,24 @@ export const App = () => {
   const email = viewingUser?.email ?? user.email;
 
   return (
-    <Profile
-      email={email}
-      onUserChange={(viewingUser) => {
-        setViewingUser(viewingUser); ;
-      }}
-    />
+    <Stack>
+      <Box
+        marginLeft={2}
+        marginTop={1}
+        sx={{
+          ":hover": {
+            cursor: "pointer",
+          },
+        }}
+      >
+        <img src="/logo.png" width="25px" height="30px"  />
+      </Box>
+      <Profile
+        email={email}
+        onUserChange={(viewingUser) => {
+          setViewingUser(viewingUser);
+        }}
+      />
+    </Stack>
   );
 };
