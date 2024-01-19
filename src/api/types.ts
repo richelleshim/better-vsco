@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z } from "zod";
 
 export enum Collection {
   POSTS = "posts",
@@ -13,6 +13,6 @@ export enum Folder {
 export const DateSchema = z
   .object({ seconds: z.number(), nanoseconds: z.number() })
   .transform(({ seconds }) => {
-    return new Date(seconds * 1000)
-  })
-export type DateSchema = z.infer<typeof DateSchema>
+    return new Date(seconds * 1000);
+  });
+export type DateSchema = z.infer<typeof DateSchema>;

@@ -112,7 +112,7 @@ export const App = () => {
           },
         }}
       >
-        <img src="/logo.png" width="25px" height="30px"  />
+        <img src="/logo.png" width="25px" height="30px" />
       </Box>
       <Profile
         email={email}
