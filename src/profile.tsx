@@ -9,7 +9,7 @@ import {
   Menu,
   MenuButton,
   MenuItem,
-  Button,
+  Button
 } from "@mui/joy";
 import { Post, useSubscribePosts } from "./api/post";
 import { MoreHoriz, AddSharp, Logout } from "@mui/icons-material";
@@ -120,41 +120,55 @@ export const Profile = ({
               </Typography>
             </Button>
           </Stack>
-          <Stack alignItems="center">
-            <Stack direction="row" spacing={1}>
-              <Button
-                variant={!isViewingUsers ? "solid" : "plain"}
-                onClick={() => {
-                  setIsViewingUsers(false);
-                }}
-              >
-                Gallery
-              </Button>
-              <Button
-                variant={isViewingUsers ? "solid" : "plain"}
-                onClick={() => {
-                  setIsViewingUsers(true);
-                }}
-              >
-                Collection
-              </Button>
+          <Stack>
+            <Stack alignItems="center" pb={4}>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Button
+                  variant={!isViewingUsers ? "solid" : "plain"}
+                  onClick={() => {
+                    setIsViewingUsers(false);
+                  }}
+                >
+                  Gallery
+                </Button>
+                <Button
+                  variant={isViewingUsers ? "solid" : "plain"}
+                  onClick={() => {
+                    setIsViewingUsers(true);
+                  }}
+                >
+                  Collection
+                </Button>
+              </Stack>
             </Stack>
           </Stack>
           {isViewingUsers ? (
-            <Stack>
-              {users.map((user) => {
-                return (
-                  <Button
-                    key={user.username}
-                    onClick={() => {
-                      onUserChange(user);;
-                    }}
-                  >
-                    {user.username}
-                  </Button>
-                );
-              })}
-            </Stack>
+            <Container maxWidth="lg">
+              <Stack direction="row" spacing={1}>
+                {users.map((user) => {
+                  return (
+                    <div
+                      onClick={() => {
+                        onUserChange(user);
+                        setIsViewingUsers(false);
+                      }}
+                    >
+                      <Stack
+                        spacing={1}
+                        sx={{
+                          ":hover": {
+                            cursor: "pointer",
+                          },
+                        }}
+                      >
+                        <img width="200px" src={user.profilePictureURL} />
+                        <Typography>{user.username}</Typography>
+                      </Stack>
+                    </div>
+                  );
+                })}
+              </Stack>
+            </Container>
           ) : (
             <Container maxWidth="lg">
               <Stack direction="row" spacing={3}>
